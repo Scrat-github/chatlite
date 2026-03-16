@@ -87,6 +87,7 @@ export default function ConversationDetailPage({
     } = await supabase.auth.getUser();
     if (!user) return;
 
+    // biome-ignore lint/suspicious/noExplicitAny: Supabase type workaround
     const { error } = await (supabase.from("messages") as any).insert({
       conversation_id: conversationId,
       sender_type: "agent",
@@ -203,4 +204,5 @@ export default function ConversationDetailPage({
       </form>
     </div>
   );
+}
 }
