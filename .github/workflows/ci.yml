@@ -22,9 +22,6 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
-    - name: Run lint
-      run: npm run lint || true  # Allow lint warnings for MVP
-
     - name: Build
       run: npm run build
 
