@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
-  // Check if user is authenticated
-  const token = request.cookies.get("auth-token")?.value;
+  // Check if user is authenticated (Supabase uses sb-* cookies)
+  const hasSession = request.cookies.get("sb-ytbqeauuovcavchuumxs-auth-token")?.value;
 
   // Protected routes
   const protectedPaths = ["/conversations", "/team", "/settings", "/analytics"];
@@ -11,7 +11,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (isProtectedPath && !token) {
+  if (isProtectedPath && !hasSession) {
     const loginUrl = new URL("/auth/login", request.url);
     loginUrl.searchParams.set("redirect", request.nextUrl.pathname);
     return NextResponse.redirect(loginUrl);
@@ -23,7 +23,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith(path),
   );
 
-  if (isAuthPath && token) {
+  if (isAuthPath && hasSession) {
     return NextResponse.redirect(new URL("/conversations", request.url));
   }
 

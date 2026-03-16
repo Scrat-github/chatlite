@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -12,22 +14,35 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('🔵 登录提交', { email, password: '***' });
     setLoading(true);
     setError(null);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const supabase = createClient();
+      console.log('🔵 Supabase 客户端创建成功');
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      window.location.href = "/conversations";
+      if (error) {
+        console.error('❌ 登录失败:', error);
+        setError(error.message);
+      } else {
+        console.log('✅ 登录成功:', data.user?.email);
+        // 等待一小段时间确保 session 设置完成
+        await new Promise(resolve => setTimeout(resolve, 100));
+        router.push("/conversations");
+        router.refresh();
+      }
+    } catch (err) {
+      console.error('❌ 异常:', err);
+      setError(err instanceof Error ? err.message : '未知错误');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
