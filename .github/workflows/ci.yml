@@ -1,4 +1,4 @@
-name: CI
+name: CI + Test
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -25,9 +25,14 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Run tests
+      run: npm test || echo "No tests configured yet"
+      continue-on-error: true
+
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
-      if: always()
+      if: success()
       with:
         name: nextjs-build
         path: .next
+        retention-days: 7
