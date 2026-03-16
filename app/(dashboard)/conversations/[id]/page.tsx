@@ -1,24 +1,26 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { formatRelativeTime, formatDate } from '@/lib/utils';
-import type { Conversation, Message } from '@/types';
+import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { formatRelativeTime, formatDate } from "@/lib/utils";
+import type { Conversation, Message } from "@/types";
 
 interface ConversationDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function ConversationDetailPage({ params }: ConversationDetailPageProps) {
+export default function ConversationDetailPage({
+  params,
+}: ConversationDetailPageProps) {
   const [conversation, setConversation] = useState<Conversation | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [newMessage, setNewMessage] = useState('');
+  const [newMessage, setNewMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [conversationId, setConversationId] = useState<string>('');
+  const [conversationId, setConversationId] = useState<string>("");
   const supabase = createClient();
 
   useEffect(() => {
-    params.then(p => setConversationId(p.id));
+    params.then((p) => setConversationId(p.id));
   }, [params]);
 
   useEffect(() => {
@@ -26,9 +28,9 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
 
     async function loadConversation() {
       const { data: convData } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('id', conversationId)
+        .from("conversations")
+        .select("*")
+        .eq("id", conversationId)
         .single();
 
       const conv = convData as Conversation | null;
@@ -38,10 +40,10 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
       }
 
       const { data: msgsData } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .order('created_at', { ascending: true });
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", conversationId)
+        .order("created_at", { ascending: true });
 
       const msgs = (msgsData || []) as Message[];
 
@@ -58,16 +60,16 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
     const channel = supabase
       .channel(`conversation-${conversationId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
           setMessages((prev) => [...prev, payload.new as Message]);
-        }
+        },
       )
       .subscribe();
 
@@ -80,23 +82,24 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
     e.preventDefault();
     if (!newMessage.trim() || !conversationId) return;
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
-    const { error } = await (supabase.from('messages') as any).insert({
+    const { error } = await (supabase.from("messages") as any).insert({
       conversation_id: conversationId,
-      sender_type: 'agent',
+      sender_type: "agent",
       sender_id: user.id,
       content: newMessage.trim(),
     });
 
     if (!error) {
-      setNewMessage('');
+      setNewMessage("");
       // Update last_message_at
-      await (supabase
-        .from('conversations') as any)
+      await (supabase.from("conversations") as any)
         .update({ last_message_at: new Date().toISOString() })
-        .eq('id', conversationId);
+        .eq("id", conversationId);
     }
   };
 
@@ -122,18 +125,20 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
         <div>
           <h2 className="font-semibold text-gray-900">
-            {conversation.visitor_name || '访客'}
+            {conversation.visitor_name || "访客"}
           </h2>
           <p className="text-sm text-gray-500">
-            {conversation.visitor_email || '未提供邮箱'}
+            {conversation.visitor_email || "未提供邮箱"}
           </p>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${
-          conversation.status === 'open'
-            ? 'bg-green-100 text-green-800'
-            : 'bg-gray-100 text-gray-800'
-        }`}>
-          {conversation.status === 'open' ? '进行中' : '已关闭'}
+        <span
+          className={`text-xs px-2 py-1 rounded-full ${
+            conversation.status === "open"
+              ? "bg-green-100 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+        >
+          {conversation.status === "open" ? "进行中" : "已关闭"}
         </span>
       </div>
 
@@ -143,22 +148,22 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
           <div
             key={message.id}
             className={`flex ${
-              message.sender_type === 'agent' ? 'justify-end' : 'justify-start'
+              message.sender_type === "agent" ? "justify-end" : "justify-start"
             }`}
           >
             <div
               className={`max-w-[70%] px-4 py-2 rounded-lg ${
-                message.sender_type === 'agent'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900'
+                message.sender_type === "agent"
+                  ? "bg-blue-600 text-white"
+                  : "bg-gray-100 text-gray-900"
               }`}
             >
               <p>{message.content}</p>
               <p
                 className={`text-xs mt-1 ${
-                  message.sender_type === 'agent'
-                    ? 'text-blue-200'
-                    : 'text-gray-500'
+                  message.sender_type === "agent"
+                    ? "text-blue-200"
+                    : "text-gray-500"
                 }`}
               >
                 {formatRelativeTime(message.created_at)}
@@ -175,7 +180,10 @@ export default function ConversationDetailPage({ params }: ConversationDetailPag
       </div>
 
       {/* Input */}
-      <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-200">
+      <form
+        onSubmit={handleSendMessage}
+        className="p-4 border-t border-gray-200"
+      >
         <div className="flex gap-2">
           <input
             type="text"

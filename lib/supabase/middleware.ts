@@ -1,5 +1,5 @@
-import { createServerClient } from '@supabase/ssr';
-import { NextResponse, type NextRequest } from 'next/server';
+import { createServerClient } from "@supabase/ssr";
+import { NextResponse, type NextRequest } from "next/server";
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
@@ -16,17 +16,17 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
         },
       },
-    }
+    },
   );
 
   // Do not run code between createServerClient and
@@ -38,21 +38,23 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   // Protect dashboard routes
-  if (request.nextUrl.pathname.startsWith('/conversations') ||
-      request.nextUrl.pathname.startsWith('/analytics') ||
-      request.nextUrl.pathname.startsWith('/settings') ||
-      request.nextUrl.pathname.startsWith('/team')) {
+  if (
+    request.nextUrl.pathname.startsWith("/conversations") ||
+    request.nextUrl.pathname.startsWith("/analytics") ||
+    request.nextUrl.pathname.startsWith("/settings") ||
+    request.nextUrl.pathname.startsWith("/team")
+  ) {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = '/auth/login';
+      url.pathname = "/auth/login";
       return NextResponse.redirect(url);
     }
   }
 
   // Redirect logged-in users away from auth pages
-  if (request.nextUrl.pathname.startsWith('/auth') && user) {
+  if (request.nextUrl.pathname.startsWith("/auth") && user) {
     const url = request.nextUrl.clone();
-    url.pathname = '/conversations';
+    url.pathname = "/conversations";
     return NextResponse.redirect(url);
   }
 

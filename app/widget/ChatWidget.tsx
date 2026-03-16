@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from "react";
 
 interface ChatWidgetProps {
   workspaceSlug: string;
@@ -9,24 +9,32 @@ interface ChatWidgetProps {
 export default function ChatWidget({ workspaceSlug }: ChatWidgetProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<any[]>([
-    { id: '1', content: '你好！有什么可以帮助你的吗？', sender_type: 'agent', created_at: new Date().toISOString() }
+    {
+      id: "1",
+      content: "你好！有什么可以帮助你的吗？",
+      sender_type: "agent",
+      created_at: new Date().toISOString(),
+    },
   ]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const sendMessage = () => {
     if (!input.trim()) return;
-    setMessages(prev => [...prev, {
-      id: Date.now().toString(),
-      content: input,
-      sender_type: 'visitor',
-      created_at: new Date().toISOString()
-    }]);
-    setInput('');
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        content: input,
+        sender_type: "visitor",
+        created_at: new Date().toISOString(),
+      },
+    ]);
+    setInput("");
     // TODO: 实际发送到 Supabase
   };
 
@@ -46,7 +54,9 @@ export default function ChatWidget({ workspaceSlug }: ChatWidgetProps) {
       {/* Header */}
       <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
         <h3 className="font-semibold">在线客服</h3>
-        <button onClick={() => setIsOpen(false)} className="hover:opacity-80">✕</button>
+        <button onClick={() => setIsOpen(false)} className="hover:opacity-80">
+          ✕
+        </button>
       </div>
 
       {/* Messages */}
@@ -54,13 +64,13 @@ export default function ChatWidget({ workspaceSlug }: ChatWidgetProps) {
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`flex ${msg.sender_type === 'visitor' ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${msg.sender_type === "visitor" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`max-w-[80%] p-3 rounded-lg ${
-                msg.sender_type === 'visitor'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-900 border border-gray-200'
+                msg.sender_type === "visitor"
+                  ? "bg-blue-600 text-white"
+                  : "bg-white text-gray-900 border border-gray-200"
               }`}
             >
               {msg.content}
@@ -76,7 +86,7 @@ export default function ChatWidget({ workspaceSlug }: ChatWidgetProps) {
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+          onKeyPress={(e) => e.key === "Enter" && sendMessage()}
           placeholder="输入消息..."
           className="flex-1 border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
         />

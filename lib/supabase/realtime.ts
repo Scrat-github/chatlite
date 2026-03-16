@@ -1,8 +1,8 @@
-import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js';
-import type { Database } from './database.types';
+import { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.types";
 
-type Message = Database['public']['Tables']['messages']['Row'];
-type Conversation = Database['public']['Tables']['conversations']['Row'];
+type Message = Database["public"]["Tables"]["messages"]["Row"];
+type Conversation = Database["public"]["Tables"]["conversations"]["Row"];
 
 export class RealtimeService {
   private supabase: SupabaseClient<Database>;
@@ -17,21 +17,21 @@ export class RealtimeService {
    */
   subscribeToMessages(
     conversationId: string,
-    onNewMessage: (message: Message) => void
+    onNewMessage: (message: Message) => void,
   ) {
     const channel = this.supabase
       .channel(`conversation:${conversationId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'messages',
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
           filter: `conversation_id=eq.${conversationId}`,
         },
         (payload) => {
           onNewMessage(payload.new as Message);
-        }
+        },
       )
       .subscribe();
 
@@ -45,33 +45,33 @@ export class RealtimeService {
   subscribeToConversations(
     workspaceId: string,
     onNewConversation: (conversation: Conversation) => void,
-    onUpdate: (conversation: Conversation) => void
+    onUpdate: (conversation: Conversation) => void,
   ) {
     const channel = this.supabase
       .channel(`workspace:${workspaceId}`)
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'conversations',
+          event: "INSERT",
+          schema: "public",
+          table: "conversations",
           filter: `workspace_id=eq.${workspaceId}`,
         },
         (payload) => {
           onNewConversation(payload.new as Conversation);
-        }
+        },
       )
       .on(
-        'postgres_changes',
+        "postgres_changes",
         {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'conversations',
+          event: "UPDATE",
+          schema: "public",
+          table: "conversations",
           filter: `workspace_id=eq.${workspaceId}`,
         },
         (payload) => {
           onUpdate(payload.new as Conversation);
-        }
+        },
       )
       .subscribe();
 

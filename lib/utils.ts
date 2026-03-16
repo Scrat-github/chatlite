@@ -1,5 +1,5 @@
-import { type ClassValue, clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
+import { type ClassValue, clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 /**
  * Merge Tailwind CSS classes
@@ -17,7 +17,7 @@ export function formatRelativeTime(date: string | Date): string {
   const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
 
   if (diffInSeconds < 60) {
-    return '刚刚';
+    return "刚刚";
   }
 
   const diffInMinutes = Math.floor(diffInSeconds / 60);
@@ -35,17 +35,17 @@ export function formatRelativeTime(date: string | Date): string {
     return `${diffInDays}天前`;
   }
 
-  return past.toLocaleDateString('zh-CN');
+  return past.toLocaleDateString("zh-CN");
 }
 
 /**
  * Format date
  */
 export function formatDate(date: string | Date): string {
-  return new Date(date).toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
+  return new Date(date).toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 }
 
@@ -54,5 +54,5 @@ export function formatDate(date: string | Date): string {
  */
 export function truncate(text: string, length: number): string {
   if (text.length <= length) return text;
-  return text.slice(0, length) + '...';
+  return text.slice(0, length) + "...";
 }

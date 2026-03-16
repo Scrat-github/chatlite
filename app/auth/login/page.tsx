@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import Link from 'next/link';
-import { createClient } from '@/lib/supabase/client';
+import { useState } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ export default function LoginPage() {
     if (error) {
       setError(error.message);
     } else {
-      window.location.href = '/conversations';
+      window.location.href = "/conversations";
     }
 
     setLoading(false);
@@ -49,7 +49,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               邮箱
             </label>
             <input
@@ -64,7 +67,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               密码
             </label>
             <input
@@ -83,13 +89,16 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? '登录中...' : '登录'}
+            {loading ? "登录中..." : "登录"}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-500 mt-6">
-          还没有账户？{' '}
-          <Link href="/auth/register" className="text-blue-600 hover:text-blue-700 font-medium">
+          还没有账户？{" "}
+          <Link
+            href="/auth/register"
+            className="text-blue-600 hover:text-blue-700 font-medium"
+          >
             免费注册
           </Link>
         </p>

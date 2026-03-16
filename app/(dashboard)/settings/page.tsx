@@ -1,21 +1,23 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-import type { Profile, Workspace } from '@/types';
+import type { Profile, Workspace } from "@/types";
 
 export default async function SettingsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect("/auth/login");
   }
 
   // Get user's workspace
   const { data: profileData } = await supabase
-    .from('profiles')
-    .select('workspace_id')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("workspace_id")
+    .eq("id", user.id)
     .single();
   const profile = profileData as Profile | null;
 
@@ -24,9 +26,9 @@ export default async function SettingsPage() {
 
   if (workspaceId) {
     const { data: workspaceData } = await supabase
-      .from('workspaces')
-      .select('*')
-      .eq('id', workspaceId)
+      .from("workspaces")
+      .select("*")
+      .eq("id", workspaceId)
       .single();
     workspace = workspaceData as Workspace | null;
   }
@@ -58,11 +60,11 @@ export default async function SettingsPage() {
                 订阅状态
               </label>
               <p className="text-gray-600">
-                {workspace?.subscription_status === 'trial'
-                  ? `试用中 (截止: ${workspace?.trial_ends_at ? new Date(workspace.trial_ends_at).toLocaleDateString('zh-CN') : 'N/A'})`
-                  : workspace?.subscription_status === 'active'
-                  ? '已订阅'
-                  : '未订阅'}
+                {workspace?.subscription_status === "trial"
+                  ? `试用中 (截止: ${workspace?.trial_ends_at ? new Date(workspace.trial_ends_at).toLocaleDateString("zh-CN") : "N/A"})`
+                  : workspace?.subscription_status === "active"
+                    ? "已订阅"
+                    : "未订阅"}
               </p>
             </div>
           </div>
@@ -71,9 +73,11 @@ export default async function SettingsPage() {
         {/* Widget settings */}
         <div className="bg-white rounded-lg border border-gray-200 p-6">
           <h2 className="text-lg font-semibold mb-4">聊天组件</h2>
-          <p className="text-gray-500 mb-4">将以下代码添加到您的网站以启用聊天组件：</p>
+          <p className="text-gray-500 mb-4">
+            将以下代码添加到您的网站以启用聊天组件：
+          </p>
           <pre className="bg-gray-100 p-4 rounded-lg text-sm overflow-x-auto">
-{`<script>
+            {`<script>
   (function() {
     var d = document;
     var s = d.createElement('script');

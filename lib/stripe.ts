@@ -1,7 +1,7 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2026-02-25.clover',
+  apiVersion: "2026-02-25.clover",
 });
 
 const PRICE_IDS = {
@@ -15,23 +15,23 @@ const PRICE_IDS = {
 export async function createCheckoutSession({
   workspaceId,
   email,
-  plan = 'monthly',
+  plan = "monthly",
   returnUrl,
 }: {
   workspaceId: string;
   email: string;
-  plan?: 'monthly' | 'yearly';
+  plan?: "monthly" | "yearly";
   returnUrl: string;
 }) {
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ['card'],
+    payment_method_types: ["card"],
     line_items: [
       {
         price: PRICE_IDS[plan],
         quantity: 1,
       },
     ],
-    mode: 'subscription',
+    mode: "subscription",
     success_url: `${returnUrl}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${returnUrl}?canceled=true`,
     customer_email: email,
@@ -51,7 +51,10 @@ export async function createCheckoutSession({
 /**
  * Create a customer portal session for managing subscriptions
  */
-export async function createPortalSession(customerId: string, returnUrl: string) {
+export async function createPortalSession(
+  customerId: string,
+  returnUrl: string,
+) {
   const session = await stripe.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
@@ -66,12 +69,12 @@ export async function createPortalSession(customerId: string, returnUrl: string)
 export async function handleWebhookEvent(
   signature: string,
   body: string,
-  webhookSecret: string
+  webhookSecret: string,
 ) {
   const event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
   switch (event.type) {
-    case 'checkout.session.completed': {
+    case "checkout.session.completed": {
       const session = event.data.object;
       const workspaceId = session.metadata?.workspace_id;
       const subscriptionId = session.subscription;
@@ -80,46 +83,49 @@ export async function handleWebhookEvent(
         // Update workspace subscription status
         await updateWorkspaceSubscription(workspaceId, {
           stripe_subscription_id: subscriptionId as string,
-          subscription_status: 'trial',
+          subscription_status: "trial",
           trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
         });
       }
       break;
     }
 
-    case 'customer.subscription.updated': {
+    case "customer.subscription.updated": {
       const subscription = event.data.object;
       const workspaceId = await getWorkspaceBySubscriptionId(
-        subscription.id as string
+        subscription.id as string,
       );
 
       if (workspaceId) {
         await updateWorkspaceSubscription(workspaceId, {
           subscription_status: subscription.status as any,
-          plan: subscription.items.data[0]?.price?.nickname === 'Pro Monthly' ? 'pro' : 'free',
+          plan:
+            subscription.items.data[0]?.price?.nickname === "Pro Monthly"
+              ? "pro"
+              : "free",
         });
       }
       break;
     }
 
-    case 'customer.subscription.deleted': {
+    case "customer.subscription.deleted": {
       const subscription = event.data.object;
       const workspaceId = await getWorkspaceBySubscriptionId(
-        subscription.id as string
+        subscription.id as string,
       );
 
       if (workspaceId) {
         await updateWorkspaceSubscription(workspaceId, {
-          subscription_status: 'canceled',
-          plan: 'free',
+          subscription_status: "canceled",
+          plan: "free",
         });
       }
       break;
     }
 
-    case 'invoice.payment_failed': {
+    case "invoice.payment_failed": {
       // Handle failed payment
-      console.log('Invoice payment failed:', event.data.object.id);
+      console.log("Invoice payment failed:", event.data.object.id);
       break;
     }
   }
@@ -134,25 +140,25 @@ export function getPricing() {
   return {
     monthly: {
       price: 29,
-      period: 'month',
+      period: "month",
       features: [
-        'Unlimited conversations',
-        'Up to 5 agents',
-        'Basic analytics',
-        'Email support',
-        '14-day free trial',
+        "Unlimited conversations",
+        "Up to 5 agents",
+        "Basic analytics",
+        "Email support",
+        "14-day free trial",
       ],
     },
     yearly: {
       price: 290,
-      period: 'year',
-      savings: 'Save 17%',
+      period: "year",
+      savings: "Save 17%",
       features: [
-        'Everything in Monthly',
-        'Priority support',
-        'Advanced analytics',
-        'Custom branding',
-        '14-day free trial',
+        "Everything in Monthly",
+        "Priority support",
+        "Advanced analytics",
+        "Custom branding",
+        "14-day free trial",
       ],
     },
   };
@@ -166,14 +172,14 @@ async function updateWorkspaceSubscription(
     subscription_status?: string;
     plan?: string;
     trial_ends_at?: Date;
-  }
+  },
 ) {
   // Implement with your database
-  console.log('Updating workspace subscription:', workspaceId, data);
+  console.log("Updating workspace subscription:", workspaceId, data);
 }
 
 async function getWorkspaceBySubscriptionId(subscriptionId: string) {
   // Implement with your database
-  console.log('Finding workspace by subscription:', subscriptionId);
+  console.log("Finding workspace by subscription:", subscriptionId);
   return null;
 }

@@ -1,21 +1,23 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-import type { Profile } from '@/types';
+import type { Profile } from "@/types";
 
 export default async function AnalyticsPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect("/auth/login");
   }
 
   // Get user's workspace
   const { data: profileData } = await supabase
-    .from('profiles')
-    .select('workspace_id')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("workspace_id")
+    .eq("id", user.id)
     .single();
   const profile = profileData as Profile | null;
 
@@ -26,16 +28,16 @@ export default async function AnalyticsPage() {
 
   if (workspaceId) {
     const { count: total } = await supabase
-      .from('conversations')
-      .select('*', { count: 'exact', head: true })
-      .eq('workspace_id', workspaceId);
+      .from("conversations")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId);
     totalConversations = total || 0;
 
     const { count: open } = await supabase
-      .from('conversations')
-      .select('*', { count: 'exact', head: true })
-      .eq('workspace_id', workspaceId)
-      .eq('status', 'open');
+      .from("conversations")
+      .select("*", { count: "exact", head: true })
+      .eq("workspace_id", workspaceId)
+      .eq("status", "open");
     openConversations = open || 0;
   }
 
@@ -49,11 +51,15 @@ export default async function AnalyticsPage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-500 mb-1">总对话数</p>
-          <p className="text-3xl font-bold text-gray-900">{totalConversations || 0}</p>
+          <p className="text-3xl font-bold text-gray-900">
+            {totalConversations || 0}
+          </p>
         </div>
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-500 mb-1">进行中对话</p>
-          <p className="text-3xl font-bold text-blue-600">{openConversations || 0}</p>
+          <p className="text-3xl font-bold text-blue-600">
+            {openConversations || 0}
+          </p>
         </div>
         <div className="bg-white p-6 rounded-lg border border-gray-200">
           <p className="text-sm text-gray-500 mb-1">平均响应时间</p>

@@ -1,21 +1,23 @@
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
-import type { Profile } from '@/types';
+import type { Profile } from "@/types";
 
 export default async function TeamPage() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/auth/login');
+    redirect("/auth/login");
   }
 
   // Get user's workspace
   const { data: profileData } = await supabase
-    .from('profiles')
-    .select('workspace_id, role')
-    .eq('id', user.id)
+    .from("profiles")
+    .select("workspace_id, role")
+    .eq("id", user.id)
     .single();
   const profile = profileData as Profile | null;
 
@@ -25,10 +27,10 @@ export default async function TeamPage() {
 
   if (workspaceId) {
     const { data: membersData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('workspace_id', workspaceId)
-      .order('created_at', { ascending: true });
+      .from("profiles")
+      .select("*")
+      .eq("workspace_id", workspaceId)
+      .order("created_at", { ascending: true });
     members = (membersData || []) as Profile[];
   }
 
@@ -39,7 +41,7 @@ export default async function TeamPage() {
           <h1 className="text-2xl font-bold text-gray-900">团队</h1>
           <p className="text-gray-500 mt-1">管理团队成员</p>
         </div>
-        {profile?.role === 'admin' && (
+        {profile?.role === "admin" && (
           <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
             邀请成员
           </button>
@@ -64,12 +66,14 @@ export default async function TeamPage() {
                 </p>
                 <p className="text-sm text-gray-500">{member.email}</p>
               </div>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                member.role === 'admin'
-                  ? 'bg-purple-100 text-purple-800'
-                  : 'bg-blue-100 text-blue-800'
-              }`}>
-                {member.role === 'admin' ? '管理员' : '客服'}
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${
+                  member.role === "admin"
+                    ? "bg-purple-100 text-purple-800"
+                    : "bg-blue-100 text-blue-800"
+                }`}
+              >
+                {member.role === "admin" ? "管理员" : "客服"}
               </span>
             </div>
           ))}

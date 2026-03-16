@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import { createRealtimeService } from '@/lib/supabase/realtime';
+import { useEffect, useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { createRealtimeService } from "@/lib/supabase/realtime";
 
 /**
  * Hook for realtime messages in a conversation
@@ -25,10 +25,10 @@ export function useRealtimeMessages(conversationId: string | null) {
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .from('messages')
-          .select('*')
-          .eq('conversation_id', conversationId)
-          .order('created_at', { ascending: true });
+          .from("messages")
+          .select("*")
+          .eq("conversation_id", conversationId)
+          .order("created_at", { ascending: true });
 
         if (error) throw error;
         setMessages(data || []);
@@ -43,9 +43,12 @@ export function useRealtimeMessages(conversationId: string | null) {
 
     // Subscribe to new messages
     const realtime = createRealtimeService(supabase);
-    const unsubscribe = realtime.subscribeToMessages(conversationId, (newMessage) => {
-      setMessages((prev) => [...prev, newMessage]);
-    });
+    const unsubscribe = realtime.subscribeToMessages(
+      conversationId,
+      (newMessage) => {
+        setMessages((prev) => [...prev, newMessage]);
+      },
+    );
 
     return () => {
       unsubscribe();
@@ -68,10 +71,10 @@ export function useRealtimeConversations(workspaceId: string | null) {
     // Load initial conversations
     const loadConversations = async () => {
       const { data } = await supabase
-        .from('conversations')
-        .select('*')
-        .eq('workspace_id', workspaceId)
-        .order('last_message_at', { ascending: false });
+        .from("conversations")
+        .select("*")
+        .eq("workspace_id", workspaceId)
+        .order("last_message_at", { ascending: false });
 
       if (data) setConversations(data);
     };
@@ -87,9 +90,9 @@ export function useRealtimeConversations(workspaceId: string | null) {
       },
       (updatedConv) => {
         setConversations((prev) =>
-          prev.map((c) => (c.id === updatedConv.id ? updatedConv : c))
+          prev.map((c) => (c.id === updatedConv.id ? updatedConv : c)),
         );
-      }
+      },
     );
 
     return () => {
